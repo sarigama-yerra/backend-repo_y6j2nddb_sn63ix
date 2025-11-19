@@ -12,10 +12,10 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
+from datetime import datetime
 
-# Example schemas (replace with your own):
-
+# Example schemas (keep for reference)
 class User(BaseModel):
     """
     Users collection schema
@@ -38,11 +38,30 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# CampusClean Tech Booking schema
+class Booking(BaseModel):
+    """
+    Booking leads submitted from the website
+    Collection name: "booking"
+    """
+    full_name: str = Field(..., description="Customer full name")
+    whatsapp_number: str = Field(..., description="WhatsApp number with country code")
+    student_id: Optional[str] = Field(None, description="Student ID (optional)")
+    device_type: Literal["Laptop", "Phone"] = Field(..., description="Type of device")
+    brand_model: Optional[str] = Field(None, description="Brand and model of the device")
+    service_requested: Literal[
+        "Laptop Basic",
+        "Laptop Deep",
+        "Phone Basic",
+        "Phone Deep"
+    ] = Field(..., description="Requested service")
+    pickup_or_dropoff: Literal["Drop-off", "Pickup"] = Field(..., description="Logistics preference")
+    preferred_time: Optional[datetime] = Field(None, description="Preferred date & time")
+    notes: Optional[str] = Field(None, description="Additional notes")
+    consent_photos_and_terms: bool = Field(False, description="Consent to intake photos and terms")
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+    # Server-side enrichments
+    classification: Optional[Literal["Laptop-Deep", "Laptop-Basic", "Phone-Deep", "Phone-Basic"]] = Field(
+        None, description="AI lightweight classification tag"
+    )
+    priority: Optional[bool] = Field(False, description="True if priority lead")
